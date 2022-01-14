@@ -1,6 +1,6 @@
 @echo off
 :: Run as admin!
-
+:: NEEDS TO BE UPDATED
 set ldir=C:\Windows\Temp
 
 reg delete HKLM\SOFTWARE\Microsoft /v isInstalled /f
