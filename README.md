@@ -33,7 +33,6 @@ IP addresses and target subnet can be updated in main.bat.
 ## File system
 * C:\Users\[user]\Appdata\Local\Temp\IPX*.TMP - Windows IExpress extracted directory in %TEMP%.
 * C:\Windows\Temp\IPX*.TMP - Windows IExpress extracted directory in Windows temp.
-* C:\Windows\Temp\dapw - Captured domain admin cleartext credentials.
 * C:\Windows\Temp\main.bat - Batchworm script.
 * C:\pwned.txt - Post-morterm artifact.
 
